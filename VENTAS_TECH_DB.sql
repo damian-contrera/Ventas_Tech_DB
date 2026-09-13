@@ -94,11 +94,11 @@ INSERT INTO Productos (id_producto, Categoría, Descripción, Costo, Precio) VAL
 
 -- 3. Insertar Clientes
 INSERT INTO Clientes (id_cliente, id_territorio, Fecha_Registro, Email, Nombre_cliente, [Tipo de cliente]) VALUES
-(1, 1, '2025-01-05', 'maria@mail.com', 'María López', 'B2C'),
-(2, 4, '2025-01-10', 'carlos@mail.com', 'Carlos Ruiz', 'B2B'),
-(3, 2, '2025-02-01', 'ana@mail.com', 'Ana Gómez', 'B2C'),
-(4, 3, '2025-02-15', 'pedro@mail.com', 'Pedro Sanz', 'B2C'),
-(5, 1, '2025-03-01', 'laura@mail.com', 'Laura Torres', 'B2B');
+(1, 1, '2026-01-05', 'maria@mail.com', 'María López', 'B2C'),
+(2, 4, '2026-01-10', 'carlos@mail.com', 'Carlos Ruiz', 'B2B'),
+(3, 2, '2026-02-01', 'ana@mail.com', 'Ana Gómez', 'B2C'),
+(4, 3, '2026-02-15', 'pedro@mail.com', 'Pedro Sanz', 'B2C'),
+(5, 1, '2026-03-01', 'laura@mail.com', 'Laura Torres', 'B2B');
 
 -- 4. Insertar Ventas
 INSERT INTO Ventas (id_venta, id_producto, id_cliente, Canal, Fecha_venta, Total_venta) VALUES
