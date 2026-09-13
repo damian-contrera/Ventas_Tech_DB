@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Base de Datos: Ventas_Tech_DB
 -- Entorno: Microsoft SQL Server / Azure SQL
--- Propósito: Script DDL/DML para la práctica de Ventas_Tech_DB
+-- Propósito: Script DDL/DML basado en el modelo relacional exacto del diagrama
 -- ============================================================================
 
 -- Paso 1: Crear y usar la base de datos
@@ -17,108 +17,108 @@ GO
 -- ============================================================================
 -- DROP TABLES (Orden inverso de dependencias para no violar Foreign Keys)
 -- ============================================================================
-DROP TABLE IF EXISTS ventas;
-DROP TABLE IF EXISTS productos;
-DROP TABLE IF EXISTS clientes;
-DROP TABLE IF EXISTS categorias;
+DROP TABLE IF EXISTS Ventas;
+DROP TABLE IF EXISTS Clientes;
+DROP TABLE IF EXISTS Productos;
+DROP TABLE IF EXISTS Territorio;
 GO
 
 -- ============================================================================
--- CREATE TABLES (Definición del Esquema y Restricciones de Integridad)
+-- CREATE TABLES (Definición del Esquema según el diagrama)
 -- ============================================================================
 
--- Tabla: categorias
-CREATE TABLE categorias (
-    id_categoria INT NOT NULL,
-    nombre_categoria VARCHAR(50) NOT NULL,
-    descripcion VARCHAR(200) NULL,
-    CONSTRAINT PK_categorias PRIMARY KEY (id_categoria)
+-- Tabla: Territorio
+CREATE TABLE Territorio (
+    id_territorio INT NOT NULL,
+    Localidad VARCHAR(50) NULL,
+    Provincia VARCHAR(50) NULL,
+    Región VARCHAR(50) NULL,
+    CONSTRAINT PK_Territorio PRIMARY KEY (id_territorio)
 );
 
--- Tabla: clientes
-CREATE TABLE clientes (
-    id_cliente INT NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    ciudad VARCHAR(50) NULL,
-    fecha_registro DATE NOT NULL,
-    CONSTRAINT PK_clientes PRIMARY KEY (id_cliente),
-    CONSTRAINT UQ_clientes_email UNIQUE (email)
-);
-
--- Tabla: productos
-CREATE TABLE productos (
+-- Tabla: Productos
+CREATE TABLE Productos (
     id_producto INT NOT NULL,
-    nombre_producto VARCHAR(100) NOT NULL,
-    id_categoria INT NULL,
-    precio DECIMAL(10,2) NOT NULL,
-    stock INT NOT NULL CONSTRAINT DF_productos_stock DEFAULT 0,
-    activo TINYINT NOT NULL CONSTRAINT DF_productos_activo DEFAULT 1,
-    CONSTRAINT PK_productos PRIMARY KEY (id_producto),
-    CONSTRAINT FK_productos_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+    Categoría VARCHAR(50) NULL,
+    Descripción VARCHAR(100) NULL,
+    Costo DECIMAL(10,2) NULL,
+    Precio DECIMAL(10,2) NULL,
+    CONSTRAINT PK_Productos PRIMARY KEY (id_producto)
 );
 
--- Tabla: ventas
-CREATE TABLE ventas (
+-- Tabla: Clientes
+CREATE TABLE Clientes (
+    id_cliente INT NOT NULL,
+    id_territorio INT NULL,
+    Fecha_Registro DATE NULL,
+    Email VARCHAR(50) NULL,
+    Nombre_cliente VARCHAR(50) NULL,
+    [Tipo de cliente] VARCHAR(5) NULL,
+    CONSTRAINT PK_Clientes PRIMARY KEY (id_cliente),
+    CONSTRAINT FK_Clientes_Territorio FOREIGN KEY (id_territorio) REFERENCES Territorio(id_territorio)
+);
+
+-- Tabla: Ventas
+CREATE TABLE Ventas (
     id_venta INT NOT NULL,
-    id_cliente INT NULL,
     id_producto INT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10,2) NOT NULL,
-    fecha_venta DATE NOT NULL,
-    CONSTRAINT PK_ventas PRIMARY KEY (id_venta),
-    CONSTRAINT FK_ventas_clientes FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
-    CONSTRAINT FK_ventas_productos FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+    id_cliente INT NULL,
+    Canal VARCHAR(50) NULL,
+    Fecha_venta DATE NULL,
+    Total_venta DECIMAL(10,2) NULL,
+    CONSTRAINT PK_Ventas PRIMARY KEY (id_venta),
+    CONSTRAINT FK_Ventas_Productos FOREIGN KEY (id_producto) REFERENCES Productos(id_producto),
+    CONSTRAINT FK_Ventas_Clientes FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
 );
 GO
 
 -- ============================================================================
--- INSERT DATA (Carga Inicial DML)
+-- INSERT DATA (Carga Inicial DML coherente con el diagrama)
 -- ============================================================================
 
--- 1. Insertar Categorías
-INSERT INTO categorias (id_categoria, nombre_categoria, descripcion) VALUES 
-(1, 'Computación', 'Laptops, PCs y monitores'),
-(2, 'Accesorios', 'Periféricos y complementos'),
-(3, 'Audio', 'Auriculares y parlantes'),
-(4, 'Almacenamiento', 'Discos y memorias');
+-- 1. Insertar Territorios
+INSERT INTO Territorio (id_territorio, Localidad, Provincia, Región) VALUES
+(1, 'CABA', 'Buenos Aires', 'Centro'),
+(2, 'Rosario', 'Santa Fe', 'Centro'),
+(3, 'Mendoza', 'Mendoza', 'Cuyo'),
+(4, 'Córdoba', 'Córdoba', 'Centro');
 
--- 2. Insertar Clientes
-INSERT INTO clientes (id_cliente, nombre, email, ciudad, fecha_registro) VALUES 
-(1, 'María López',   'maria@mail.com',   'Buenos Aires', '2026-01-05'),
-(2, 'Carlos Ruiz',   'carlos@mail.com',  'Córdoba',      '2026-01-10'),
-(3, 'Ana Gómez',     'ana@mail.com',     'Rosario',      '2026-02-01'),
-(4, 'Pedro Sanz',    'pedro@mail.com',   'Mendoza',      '2026-02-15'),
-(5, 'Laura Torres',  'laura@mail.com',   'Tucumán',      '2026-03-01');
+-- 2. Insertar Productos
+INSERT INTO Productos (id_producto, Categoría, Descripción, Costo, Precio) VALUES
+(1, 'Computación', 'Laptop Pro 15', 800.00, 1200.00),
+(2, 'Accesorios', 'Mouse Inalámbrico', 15.00, 28.00),
+(3, 'Computación', 'Monitor 4K 27"', 300.00, 450.00),
+(4, 'Audio', 'Auriculares BT Pro', 70.00, 120.00),
+(5, 'Almacenamiento', 'SSD Externo 1TB', 80.00, 130.00),
+(6, 'Accesorios', 'Teclado Mecánico', 50.00, 95.00);
 
--- 3. Insertar Productos
-INSERT INTO productos (id_producto, nombre_producto, id_categoria, precio, stock, activo) VALUES 
-(1, 'Laptop Pro 15',       1, 1200.00, 15, 1),
-(2, 'Mouse Inalámbrico',   2,   28.00, 80, 1),
-(3, 'Monitor 4K 27"',      1,  450.00, 12, 1),
-(4, 'Auriculares BT Pro',  3,  120.00, 35, 1),
-(5, 'SSD Externo 1TB',     4,  130.00, 18, 1),
-(6, 'Teclado Mecánico',    2,   95.00, 40, 1);
+-- 3. Insertar Clientes
+INSERT INTO Clientes (id_cliente, id_territorio, Fecha_Registro, Email, Nombre_cliente, [Tipo de cliente]) VALUES
+(1, 1, '2025-01-05', 'maria@mail.com', 'María López', 'B2C'),
+(2, 4, '2025-01-10', 'carlos@mail.com', 'Carlos Ruiz', 'B2B'),
+(3, 2, '2025-02-01', 'ana@mail.com', 'Ana Gómez', 'B2C'),
+(4, 3, '2025-02-15', 'pedro@mail.com', 'Pedro Sanz', 'B2C'),
+(5, 1, '2025-03-01', 'laura@mail.com', 'Laura Torres', 'B2B');
 
 -- 4. Insertar Ventas
-INSERT INTO ventas (id_venta, id_cliente, id_producto, cantidad, precio_unitario, fecha_venta) VALUES 
-(1,  1, 1, 2, 1200.00, '2024-03-05'),
-(2,  2, 2, 5,   28.00, '2024-03-06'),
-(3,  3, 3, 1,  450.00, '2024-03-07'),
-(4,  1, 4, 2,  120.00, '2024-03-08'),
-(5,  4, 5, 3,  130.00, '2024-03-10'),
-(6,  2, 6, 4,   95.00, '2024-03-11'),
-(7,  5, 1, 1, 1200.00, '2024-03-12'),
-(8,  3, 2, 8,   28.00, '2024-03-13'),
-(9,  4, 4, 1,  120.00, '2024-03-14'),
-(10, 5, 3, 2,  450.00, '2024-03-15');
+INSERT INTO Ventas (id_venta, id_producto, id_cliente, Canal, Fecha_venta, Total_venta) VALUES
+(1,  1, 1, 'Online', '2026-03-05', 2400.00),
+(2,  2, 2, 'Físico', '2026-03-06', 140.00),
+(3,  3, 3, 'Online', '2026-03-07', 450.00),
+(4,  4, 1, 'Físico', '2026-03-08', 240.00),
+(5,  5, 4, 'Online', '2026-03-10', 390.00),
+(6,  6, 2, 'Online', '2026-03-11', 380.00),
+(7,  1, 5, 'Físico', '2026-03-12', 1200.00),
+(8,  2, 3, 'Online', '2026-03-13', 224.00),
+(9,  4, 4, 'Físico', '2026-03-14', 120.00),
+(10, 3, 5, 'Online', '2026-03-15', 900.00);
 GO
 
 -- ============================================================================
 -- VERIFICACIÓN DE DATOS (Consultas de Validación)
 -- ============================================================================
-SELECT * FROM categorias;
-SELECT * FROM clientes;
-SELECT * FROM productos;
-SELECT * FROM ventas;
+SELECT * FROM Territorio;
+SELECT * FROM Productos;
+SELECT * FROM Clientes;
+SELECT * FROM Ventas;
 GO
